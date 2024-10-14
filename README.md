@@ -1,7 +1,4 @@
-## Acesse o projeto online
-
-###  **O projeto está disponível no GitHub Pages!** Você pode acessá-lo através do seguinte link: [Projeto no GitHub Pages](https://matheuscassioli.github.io/react-ignite-rocketseat/)
----
+ 
 ## Como rodar o projeto
 
 ### Passo a passo para baixar e rodar o projeto localmente:
