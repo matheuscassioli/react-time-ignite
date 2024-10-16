@@ -170,7 +170,7 @@ span{
 
   
 
-`,Mv="/assets/CassiDEV-pkbGsqbX.png",Av=()=>O.jsxs(Fv,{children:[O.jsx("img",{src:Mv}),O.jsxs("nav",{children:[O.jsx(Ga,{to:"/react-time-ignite",children:"Home"}),O.jsx(Ga,{to:"/history",children:"teste2"})]})]}),Uv=cn.div` 
+`,Mv="/react-time-ignite/assets/CassiDEV-pkbGsqbX.png",Av=()=>O.jsxs(Fv,{children:[O.jsx("img",{src:Mv}),O.jsxs("nav",{children:[O.jsx(Ga,{to:"/react-time-ignite",children:"Home"}),O.jsx(Ga,{to:"/history",children:"teste2"})]})]}),Uv=cn.div` 
     max-width: 74rem;
     height: calc(100vh - 10rem);
     margin: 5rem auto;
