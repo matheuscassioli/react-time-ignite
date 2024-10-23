@@ -1,5 +1,6 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useState } from "react";
 import * as zod from "zod";
 import {
   CountdonwContainer,
@@ -10,6 +11,12 @@ import {
   StarCountDonwButton,
   TaskInput,
 } from "./style";
+
+interface FormatCycle {
+  id: string;
+  task: string;
+  minutesAmount: number;
+}
 
 const newCycleFormValidationSchema = zod.object({
   task: zod.string().min(1, "Informe a tarefa"),
@@ -22,6 +29,10 @@ const newCycleFormValidationSchema = zod.object({
 type NewCycleFormData = zod.infer<typeof newCycleFormValidationSchema>;
 
 const Home = () => {
+  const [cycles, setCycles] = useState<FormatCycle[]>([]);
+  const [activeCycleId, setActiveCycleId] = useState<string | null>(null);
+  const [amountSecondsPassed, setAmountSecondsPassed] = useState(0);
+
   const { register, handleSubmit, watch, reset } = useForm<NewCycleFormData>({
     resolver: zodResolver(newCycleFormValidationSchema),
     defaultValues: {
@@ -31,12 +42,27 @@ const Home = () => {
   });
 
   function handleCreateNewCycle(data: NewCycleFormData) {
-    console.log("data", data);
+    const newCycle: FormatCycle = {
+      id: String(new Date().getTime()),
+      task: data.task,
+      minutesAmount: data.minutesAmount,
+    };
+
+    setActiveCycleId(newCycle.id);
+    setCycles((state) => [...state, newCycle]);
     reset();
   }
 
   const task = watch("task");
   const isSubmitDisabled = !task;
+  const activeCycle = cycles.find((cycle) => cycle.id == activeCycleId);
+  const totalSeconds = activeCycle ? activeCycle.minutesAmount * 60 : 0;
+  const currentSeconds = activeCycle ? totalSeconds - amountSecondsPassed : 0;
+
+  const minutesAmount = Math.floor(currentSeconds / 60);
+  const secondsAmount = currentSeconds % 60;
+  const minutes = String(minutesAmount).padStart(2, "0");
+  const seconds = String(secondsAmount).padStart(2, "0");
 
   return (
     <HomeContainer>
@@ -64,18 +90,18 @@ const Home = () => {
             placeholder="00"
             step="5"
             min="5"
-            // max="60"
+            max="60"
             {...register("minutesAmount", { valueAsNumber: true })}
           />
           <span>minutos.</span>
         </div>
 
         <CountdonwContainer>
-          <span>0</span>
-          <span>0</span>
+          <span>{minutes[0]}</span>
+          <span>{minutes[1]}</span>
           <Separator>:</Separator>
-          <span>0</span>
-          <span>0</span>
+          <span>{seconds[0]}</span>
+          <span>{seconds[1]}</span>
         </CountdonwContainer>
 
         <StarCountDonwButton disabled={isSubmitDisabled} type="submit">
