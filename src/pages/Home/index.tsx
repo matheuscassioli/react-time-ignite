@@ -1,4 +1,12 @@
-import { CountdonwContainer, FormContainer, HomeContainer, Separator } from "./style";
+import {
+  CountdonwContainer,
+  FormContainer,
+  HomeContainer,
+  MinutesAmountInput,
+  Separator,
+  StarCountDonwButton,
+  TaskInput,
+} from "./style";
 
 const Home = () => {
   return (
@@ -6,11 +14,24 @@ const Home = () => {
       <FormContainer action="">
         <div>
           <label htmlFor="task">Vou trabalhar em</label>
-          <input id="task" />
+          <TaskInput list="task-sugestions" placeholder="Dê um nome para seu projeto" id="task" />
+
+          <datalist id="task-sugestions">
+            <option value="projeto 1" />
+            <option value="projeto 2" />
+            <option value="projeto 3" />
+            <option value="projeto 4" />
+          </datalist>
 
           <label htmlFor="minutesAmount">durante</label>
-          <input type="number" id="minutesAmount" />
-
+          <MinutesAmountInput
+            type="number"
+            id="minutesAmount"
+            placeholder="00"
+            step="5"
+            min="5"
+            max="60"
+          />
           <span>minutos.</span>
         </div>
 
@@ -22,7 +43,7 @@ const Home = () => {
           <span>0</span>
         </CountdonwContainer>
 
-        <button type="submit">Comecar</button>
+        <StarCountDonwButton type="submit">Comecar</StarCountDonwButton>
       </FormContainer>
     </HomeContainer>
   );
