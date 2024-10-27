@@ -1,18 +1,15 @@
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+
 import { useEffect, useState } from "react";
-import * as zod from "zod";
+
 import { differenceInSeconds } from "date-fns";
+import NewCycleForm from "./components/NewCycleForm";
+import Countdown from "./components/Countdown";
 import {
-  CountdonwContainer,
   EndCountDonwButton,
-  FormContainer,
   HomeContainer,
-  MinutesAmountInput,
-  Separator,
   StartCountDonwButton,
-  TaskInput,
 } from "./style";
+import { FormContainer } from "./components/NewCycleForm/styles";
 
 interface FormatCycle {
   id: string;
@@ -21,21 +18,10 @@ interface FormatCycle {
   startDate: Date;
   interruptedDate?: Date;
 }
-
-const newCycleFormValidationSchema = zod.object({
-  task: zod.string().min(1, "Informe a tarefa"),
-  minutesAmount: zod
-    .number()
-    .min(5, "O ciclo deve ser no minimo 5 minutos")
-    .max(60, "O ciclo deve ser no maximo 60 minutos"),
-});
-
-type NewCycleFormData = zod.infer<typeof newCycleFormValidationSchema>;
-
+ 
 const Home = () => {
   const [cycles, setCycles] = useState<FormatCycle[]>([]);
-  const [activeCycleId, setActiveCycleId] = useState<string | null>(null);
-  const [amountSecondsPassed, setAmountSecondsPassed] = useState(0);
+  const [activeCycleId, setActiveCycleId] = useState<string | null>(null); 
   const activeCycle = cycles.find((cycle) => cycle.id == activeCycleId);
 
   useEffect(() => {
@@ -54,13 +40,6 @@ const Home = () => {
     };
   }, [activeCycle]);
 
-  const { register, handleSubmit, watch, reset } = useForm<NewCycleFormData>({
-    resolver: zodResolver(newCycleFormValidationSchema),
-    defaultValues: {
-      minutesAmount: 0,
-      task: "",
-    },
-  });
 
   function handleCreateNewCycle(data: NewCycleFormData) {
     const newCycle: FormatCycle = {
@@ -108,44 +87,8 @@ const Home = () => {
   return (
     <HomeContainer>
       <FormContainer onSubmit={handleSubmit(handleCreateNewCycle)} action="">
-        <div>
-          <label htmlFor="task">Vou trabalhar em</label>
-          <TaskInput
-            list="task-sugestions"
-            disabled={!!activeCycle}
-            placeholder="Dê um nome para seu projeto"
-            id="task"
-            {...register("task")}
-          />
-
-          <datalist id="task-sugestions">
-            <option value="projeto 1" />
-            <option value="projeto 2" />
-            <option value="projeto 3" />
-            <option value="projeto 4" />
-          </datalist>
-
-          <label htmlFor="minutesAmount">durante</label>
-          <MinutesAmountInput
-            type="number"
-            id="minutesAmount"
-            placeholder="00"
-            step="5"
-            min="5"
-            disabled={!!activeCycle}
-            max="60"
-            {...register("minutesAmount", { valueAsNumber: true })}
-          />
-          <span>minutos.</span>
-        </div>
-
-        <CountdonwContainer>
-          <span>{minutes[0]}</span>
-          <span>{minutes[1]}</span>
-          <Separator>:</Separator>
-          <span>{seconds[0]}</span>
-          <span>{seconds[1]}</span>
-        </CountdonwContainer>
+        <NewCycleForm />
+        <Countdown />
 
         {activeCycle ? (
           <EndCountDonwButton type="button" onClick={handleInterruptCycle}>
