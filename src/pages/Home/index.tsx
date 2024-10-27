@@ -1,14 +1,16 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import * as zod from "zod";
+import { differenceInSeconds } from "date-fns";
 import {
   CountdonwContainer,
+  EndCountDonwButton,
   FormContainer,
   HomeContainer,
   MinutesAmountInput,
   Separator,
-  StarCountDonwButton,
+  StartCountDonwButton,
   TaskInput,
 } from "./style";
 
@@ -16,6 +18,8 @@ interface FormatCycle {
   id: string;
   task: string;
   minutesAmount: number;
+  startDate: Date;
+  interruptedDate?: Date;
 }
 
 const newCycleFormValidationSchema = zod.object({
@@ -32,6 +36,23 @@ const Home = () => {
   const [cycles, setCycles] = useState<FormatCycle[]>([]);
   const [activeCycleId, setActiveCycleId] = useState<string | null>(null);
   const [amountSecondsPassed, setAmountSecondsPassed] = useState(0);
+  const activeCycle = cycles.find((cycle) => cycle.id == activeCycleId);
+
+  useEffect(() => {
+    let interval: number;
+
+    if (activeCycle) {
+      interval = setInterval(() => {
+        setAmountSecondsPassed(
+          differenceInSeconds(new Date(), activeCycle.startDate)
+        );
+      }, 1000);
+    }
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, [activeCycle]);
 
   const { register, handleSubmit, watch, reset } = useForm<NewCycleFormData>({
     resolver: zodResolver(newCycleFormValidationSchema),
@@ -46,16 +67,18 @@ const Home = () => {
       id: String(new Date().getTime()),
       task: data.task,
       minutesAmount: data.minutesAmount,
+      startDate: new Date(),
     };
 
     setActiveCycleId(newCycle.id);
+    setAmountSecondsPassed(0);
     setCycles((state) => [...state, newCycle]);
     reset();
   }
 
   const task = watch("task");
   const isSubmitDisabled = !task;
-  const activeCycle = cycles.find((cycle) => cycle.id == activeCycleId);
+
   const totalSeconds = activeCycle ? activeCycle.minutesAmount * 60 : 0;
   const currentSeconds = activeCycle ? totalSeconds - amountSecondsPassed : 0;
 
@@ -64,6 +87,24 @@ const Home = () => {
   const minutes = String(minutesAmount).padStart(2, "0");
   const seconds = String(secondsAmount).padStart(2, "0");
 
+  useEffect(() => {
+    if (activeCycle) {
+      document.title = `${minutes}:${seconds}`;
+    }
+  }, [minutes, seconds, activeCycle]);
+
+  const handleInterruptCycle = () => {
+    setCycles(
+      cycles.map((cycle) => {
+        if (cycle.id === activeCycleId) {
+          return { ...cycle, interruptedDate: new Date() };
+        }
+        return cycle;
+      })
+    );
+    setActiveCycleId(null);
+  };
+
   return (
     <HomeContainer>
       <FormContainer onSubmit={handleSubmit(handleCreateNewCycle)} action="">
@@ -71,6 +112,7 @@ const Home = () => {
           <label htmlFor="task">Vou trabalhar em</label>
           <TaskInput
             list="task-sugestions"
+            disabled={!!activeCycle}
             placeholder="Dê um nome para seu projeto"
             id="task"
             {...register("task")}
@@ -90,6 +132,7 @@ const Home = () => {
             placeholder="00"
             step="5"
             min="5"
+            disabled={!!activeCycle}
             max="60"
             {...register("minutesAmount", { valueAsNumber: true })}
           />
@@ -104,9 +147,15 @@ const Home = () => {
           <span>{seconds[1]}</span>
         </CountdonwContainer>
 
-        <StarCountDonwButton disabled={isSubmitDisabled} type="submit">
-          Comecar
-        </StarCountDonwButton>
+        {activeCycle ? (
+          <EndCountDonwButton type="button" onClick={handleInterruptCycle}>
+            Interromper
+          </EndCountDonwButton>
+        ) : (
+          <StartCountDonwButton disabled={isSubmitDisabled} type="submit">
+            Comecar
+          </StartCountDonwButton>
+        )}
       </FormContainer>
     </HomeContainer>
   );
