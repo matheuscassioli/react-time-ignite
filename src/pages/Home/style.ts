@@ -5,6 +5,8 @@ export const HomeContainer = styled.main`
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 2rem;
+  flex-direction: column;
 
   form {
     display: flex;
@@ -13,7 +15,6 @@ export const HomeContainer = styled.main`
     gap: 1.5rem;
   }
 `;
-
 
 export const BaseCountDonwButton = styled.button`
   width: 100%;
