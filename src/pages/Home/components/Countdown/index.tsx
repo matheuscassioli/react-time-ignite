@@ -4,8 +4,8 @@ import { CyclesContext } from "../..";
 import { differenceInSeconds } from "date-fns";
 
 const Countdown = () => {
-  const { activeCycle /* activeCycleId */} = useContext(CyclesContext);
-  const [amountSecondsPassed, setAmountSecondsPassed] = useState(0);
+  const { activeCycle /* activeCycleId */, amountSecondsPassed } =
+    useContext(CyclesContext);
 
   const totalSeconds = activeCycle ? activeCycle.minutesAmount * 60 : 0;
   const currentSeconds = activeCycle ? totalSeconds - amountSecondsPassed : 0;
@@ -26,9 +26,9 @@ const Countdown = () => {
 
     if (activeCycle) {
       interval = setInterval(() => {
-        setAmountSecondsPassed(
-          differenceInSeconds(new Date(), activeCycle.startDate)
-        );
+        // setAmountSecondsPassed(
+        //   differenceInSeconds(new Date(), activeCycle.startDate)
+        // );
       }, 1000);
     }
 
