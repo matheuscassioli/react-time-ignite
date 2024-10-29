@@ -4,8 +4,8 @@ import { NavLink } from "react-router-dom";
 
 const Header = () => {
   return (
-    <HeaderContainer>
-      <img src={logo} />
+    <HeaderContainer id="header-id">
+      <img id="header-id-logo" src={logo} />
       <nav>
         <NavLink to="/react-time-ignite">Home</NavLink>
         <NavLink to="/history">teste2</NavLink>

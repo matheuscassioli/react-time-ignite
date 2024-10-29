@@ -19,9 +19,10 @@ interface FormatCycle {
 }
 
 interface CycleContextType {
-  activeCycle: Cycle | undefined;
+  activeCycle: FormatCycle | undefined;
   activeCycleId: string | null;
   amountSecondsPassed: number;
+  setAmountSecondsPassed: (seconds: number) => void;
 }
 
 export const CyclesContext = createContext({} as CycleContextType);
@@ -36,21 +37,21 @@ const newCycleFormValidationSchema = zod.object({
 
 type NewCycleFormData = zod.infer<typeof newCycleFormValidationSchema>;
 
-const newCycleForm = useForm<NewCycleFormData>({
-  resolver: zodResolver(newCycleFormValidationSchema),
-  defaultValues: {
-    minutesAmount: 0,
-    task: "",
-  },
-});
-
-const { handleSubmit, watch, reset } = newCycleForm;
-
 const Home = () => {
   const [amountSecondsPassed, setAmountSecondsPassed] = useState(0);
   const [cycles, setCycles] = useState<FormatCycle[]>([]);
   const [activeCycleId, setActiveCycleId] = useState<string | null>(null);
   const activeCycle = cycles.find((cycle) => cycle.id == activeCycleId);
+
+  const newCycleForm = useForm<NewCycleFormData>({
+    resolver: zodResolver(newCycleFormValidationSchema),
+    defaultValues: {
+      minutesAmount: 0,
+      task: "",
+    },
+  });
+
+  const { handleSubmit, watch, reset } = newCycleForm;
 
   function handleCreateNewCycle(data: NewCycleFormData) {
     const newCycle: FormatCycle = {
@@ -59,7 +60,7 @@ const Home = () => {
       minutesAmount: data.minutesAmount,
       startDate: new Date(),
     };
-
+    document.querySelector("#header-id-logo")?.classList.add("is-rotate");
     setActiveCycleId(newCycle.id);
     setAmountSecondsPassed(0);
     setCycles((state) => [...state, newCycle]);
@@ -78,29 +79,37 @@ const Home = () => {
         return cycle;
       })
     );
+    document.querySelector("#header-id-logo")?.classList.remove("is-rotate");
     setActiveCycleId(null);
   };
 
   return (
     <HomeContainer>
-      <CyclesContext.Provider
-        value={{ activeCycle, activeCycleId, amountSecondsPassed }}
-      >
-        <FormProvider {...newCycleForm}>
-          <NewCycleForm />
-        </FormProvider>
-        <Countdown />
-      </CyclesContext.Provider>
+      <form onSubmit={handleSubmit(handleCreateNewCycle)} action="">
+        <CyclesContext.Provider
+          value={{
+            activeCycle,
+            activeCycleId,
+            amountSecondsPassed,
+            setAmountSecondsPassed,
+          }}
+        >
+          <FormProvider {...newCycleForm}>
+            <NewCycleForm />
+          </FormProvider>
+          <Countdown />
+        </CyclesContext.Provider>
 
-      {activeCycle ? (
-        <EndCountDonwButton type="button" onClick={handleInterruptCycle}>
-          Interromper
-        </EndCountDonwButton>
-      ) : (
-        <StartCountDonwButton disabled={isSubmitDisabled} type="submit">
-          Comecar
-        </StartCountDonwButton>
-      )}
+        {activeCycle ? (
+          <EndCountDonwButton type="button" onClick={handleInterruptCycle}>
+            Interromper
+          </EndCountDonwButton>
+        ) : (
+          <StartCountDonwButton disabled={isSubmitDisabled} type="submit">
+            Comecar
+          </StartCountDonwButton>
+        )}
+      </form>
     </HomeContainer>
   );
 };

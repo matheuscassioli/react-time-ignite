@@ -33,7 +33,7 @@ export const MinutesAmountInput = styled(BaseInput)`
 `;
 
 
-export const FormContainer = styled.form`
+export const FormContainer = styled.div`
   width: 100%;
   display: flex;
   align-items: center;
