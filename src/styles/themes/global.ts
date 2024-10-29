@@ -7,6 +7,9 @@ export const GlobalStyles = createGlobalStyle`
     box-sizing: border-box;
     }
 
+    html{
+        max-height: 100vh;
+    }
     :focus{
         outline: 0;
         box-shadow: 0 0 0 2px ${(props) => props.theme["purple-500"]};;
@@ -21,8 +24,5 @@ export const GlobalStyles = createGlobalStyle`
         font-weight: 400;
         font-size: 1rem;
     }
-
-    #icon-header{
-        background-color: red;
-    }
+ 
 `;
