@@ -4,8 +4,8 @@ export const HistoryContainer = styled.main`
   flex: 1;
   padding: 1.5rem;
   display: flex;
-  flex-direction: column; 
-  
+  flex-direction: column;
+
   h1 {
     font-size: 1.5rem;
     color: ${(props) => props.theme["gray-100"]};
@@ -61,10 +61,10 @@ const STATUS_COLORS = {
   yellow: "yellow-500",
   green: "green-500",
   red: "red-500",
-} as const
+} as const;
 
 interface StatusProps {
-  statusColor:keyof typeof STATUS_COLORS
+  statusColor: keyof typeof STATUS_COLORS;
 }
 
 export const Status = styled.span<StatusProps>`
