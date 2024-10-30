@@ -1,4 +1,3 @@
-import { createContext, useState } from "react";
 import NewCycleForm from "./components/NewCycleForm";
 import Countdown from "./components/Countdown";
 import {
@@ -9,23 +8,8 @@ import {
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as zod from "zod";
-
-interface FormatCycle {
-  id: string;
-  task: string;
-  minutesAmount: number;
-  startDate: Date;
-  interruptedDate?: Date;
-}
-
-interface CycleContextType {
-  activeCycle: FormatCycle | undefined;
-  activeCycleId: string | null;
-  amountSecondsPassed: number;
-  setAmountSecondsPassed: (seconds: number) => void;
-}
-
-export const CyclesContext = createContext({} as CycleContextType);
+import { useContext } from "react";
+import { CyclesContext } from "../../contexts/CyclesContext";
 
 const newCycleFormValidationSchema = zod.object({
   task: zod.string().min(1, "Informe a tarefa"),
@@ -38,10 +22,8 @@ const newCycleFormValidationSchema = zod.object({
 type NewCycleFormData = zod.infer<typeof newCycleFormValidationSchema>;
 
 const Home = () => {
-  const [amountSecondsPassed, setAmountSecondsPassed] = useState(0);
-  const [cycles, setCycles] = useState<FormatCycle[]>([]);
-  const [activeCycleId, setActiveCycleId] = useState<string | null>(null);
-  const activeCycle = cycles.find((cycle) => cycle.id == activeCycleId);
+  const { handleCreateNewCycle, handleInterruptCycle, activeCycle } =
+    useContext(CyclesContext);
 
   const newCycleForm = useForm<NewCycleFormData>({
     resolver: zodResolver(newCycleFormValidationSchema),
@@ -51,54 +33,18 @@ const Home = () => {
     },
   });
 
-  const { handleSubmit, watch, reset } = newCycleForm;
-
-  function handleCreateNewCycle(data: NewCycleFormData) {
-    const newCycle: FormatCycle = {
-      id: String(new Date().getTime()),
-      task: data.task,
-      minutesAmount: data.minutesAmount,
-      startDate: new Date(),
-    };
-    document.querySelector("#header-id-logo")?.classList.add("is-rotate");
-    setActiveCycleId(newCycle.id);
-    setAmountSecondsPassed(0);
-    setCycles((state) => [...state, newCycle]);
-    reset();
-  }
+  const { handleSubmit, watch /*reset*/ } = newCycleForm;
 
   const task = watch("task");
   const isSubmitDisabled = !task;
 
-  const handleInterruptCycle = () => {
-    setCycles(
-      cycles.map((cycle) => {
-        if (cycle.id === activeCycleId) {
-          return { ...cycle, interruptedDate: new Date() };
-        }
-        return cycle;
-      })
-    );
-    document.querySelector("#header-id-logo")?.classList.remove("is-rotate");
-    setActiveCycleId(null);
-  };
-
   return (
     <HomeContainer>
       <form onSubmit={handleSubmit(handleCreateNewCycle)} action="">
-        <CyclesContext.Provider
-          value={{
-            activeCycle,
-            activeCycleId,
-            amountSecondsPassed,
-            setAmountSecondsPassed,
-          }}
-        >
-          <FormProvider {...newCycleForm}>
-            <NewCycleForm />
-          </FormProvider>
-          <Countdown />
-        </CyclesContext.Provider>
+        <FormProvider {...newCycleForm}>
+          <NewCycleForm />
+        </FormProvider>
+        <Countdown />
 
         {activeCycle ? (
           <EndCountDonwButton type="button" onClick={handleInterruptCycle}>
