@@ -5,8 +5,12 @@ import { differenceInSeconds } from "date-fns";
 import { CyclesContext } from "../../../../contexts/CyclesContext";
 
 const Countdown = () => {
-  const { activeCycle, amountSecondsPassed, setAmountSecondsPassed } =
-    useContext(CyclesContext);
+  const {
+    activeCycle,
+    amountSecondsPassed,
+    setAmountSecondsPassed,
+    markCurrentCycleAsFinished,
+  } = useContext(CyclesContext);
 
   const totalSeconds = activeCycle ? activeCycle.minutesAmount * 60 : 0;
   const currentSeconds = activeCycle ? totalSeconds - amountSecondsPassed : 0;
@@ -27,9 +31,17 @@ const Countdown = () => {
 
     if (activeCycle) {
       interval = setInterval(() => {
-        setAmountSecondsPassed(
-          differenceInSeconds(new Date(), activeCycle.startDate)
+        const secondDifference = differenceInSeconds(
+          new Date(),
+          activeCycle.startDate
         );
+        if (secondDifference >= totalSeconds) {
+          markCurrentCycleAsFinished();
+          setAmountSecondsPassed(totalSeconds);
+          clearInterval;
+        } else {
+          setAmountSecondsPassed(secondDifference);
+        }
       }, 1000);
     }
 

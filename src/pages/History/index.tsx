@@ -1,29 +1,29 @@
 import { useContext } from "react";
 import { HistoryContainer, HistoryList, Status } from "./styles";
 import { CyclesContext } from "../../contexts/CyclesContext";
+import { ptBR } from "date-fns/locale/pt-BR";
+import { formatDistanceToNow } from "date-fns";
 
 const History = () => {
   const { cycles } = useContext(CyclesContext);
 
-  const renderCycleStatus = (task) => {
-    const { startDate, minutesAmount, interruptedDate } = task;
+  interface Task {
+    finishedDate?: Date | null;
+    interruptedDate?: Date | null;
+  }
 
-    const startDateFormated = new Date(startDate);
-    const endDateOrInterruptedDate = new Date(interruptedDate);
+  const renderCycleStatus = (task: Task) => {
+    const { finishedDate, interruptedDate } = task;
 
-    const diferencaMs = Math.abs(startDateFormated - endDateOrInterruptedDate);
-
-    const diferencaMinutos = Math.floor(diferencaMs / (1000 * 60));
-
-    const isComplete = diferencaMinutos == minutesAmount;
-
-    if (interruptedDate) {
-      if (isComplete) {
-        return <Status statusColor="green">Concluido</Status>;
-      }
-      return <Status statusColor="red">Cancelado</Status>;
+    if (finishedDate) {
+      return <Status statusColor="green">Concluido</Status>;
     }
-    return <Status statusColor="yellow">Em andamento</Status>;
+    if (interruptedDate) {
+      return <Status statusColor="red">Interrompido</Status>;
+    }
+    if (!finishedDate && !interruptedDate) {
+      return <Status statusColor="yellow">Em andamento</Status>;
+    }
   };
 
   return (
@@ -42,13 +42,18 @@ const History = () => {
           </thead>
 
           <tbody>
-            {Object.keys(cycles).map((line) => {
+            {cycles.map((line) => {
               return (
-                <tr key={cycles[line].id}>
-                  <td>{cycles[line].task}</td>
-                  <td>{cycles[line].minutesAmount} minutos</td>
-                  <td>calculo de faz quanto tempo foi criado</td>
-                  <td>{renderCycleStatus(cycles[line])}</td>
+                <tr key={line.id}>
+                  <td>{line.task}</td>
+                  <td>{line.minutesAmount} minutos</td>
+                  <td>
+                    {formatDistanceToNow(line.startDate, {
+                      addSuffix: true,
+                      locale: ptBR,
+                    })}
+                  </td>
+                  <td>{renderCycleStatus(line)}</td>
                 </tr>
               );
             })}
