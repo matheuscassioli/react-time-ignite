@@ -48,7 +48,7 @@ const History = () => {
                   <td>{line.task}</td>
                   <td>{line.minutesAmount} minutos</td>
                   <td>
-                    {formatDistanceToNow(line.startDate, {
+                    {formatDistanceToNow(new Date(line.startDate), {
                       addSuffix: true,
                       locale: ptBR,
                     })}
